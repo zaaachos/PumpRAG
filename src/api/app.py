@@ -30,11 +30,8 @@ templates = Jinja2Templates(directory=templates_directory)
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
 
-
 # from src.api.clients.openai_client import ChatBot
 # from utils.config import Config
-
-
 
 
 load_dotenv()
