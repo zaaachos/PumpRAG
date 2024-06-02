@@ -1,46 +1,46 @@
 import asyncio
+from httpx import AsyncClient
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
+from collections import deque
+from dotenv import load_dotenv
 
 # from clients.openai_client import OpenAIClient
 # from clients.rag_client import RAGVectorDatabaseClient
 
 # Initialize FASTAPI app
 app = FastAPI()
-# Mount the static files directory
-static_directory = os.path.join(os.path.dirname(__file__), "../frontend/static")
-if not os.path.isdir(static_directory):
-    raise RuntimeError(f"Static directory '{static_directory}' does not exist")
 
-app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
 # Set the templates directory
 templates_directory = os.path.join(os.path.dirname(__file__), "../frontend/templates")
 if not os.path.isdir(templates_directory):
     raise RuntimeError(f"Templates directory '{templates_directory}' does not exist")
 
+# Mount the static files directory
+static_directory = os.path.join(os.path.dirname(__file__), "../frontend/static")
+if not os.path.isdir(static_directory):
+    raise RuntimeError(f"Static directory '{static_directory}' does not exist")
+
 templates = Jinja2Templates(directory=templates_directory)
-from httpx import AsyncClient
+app.mount("/static", StaticFiles(directory=static_directory), name="static")
+
+
+
 # from src.api.clients.openai_client import ChatBot
 # from utils.config import Config
 
 
-from collections import deque
 
-import os
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
 # cnfg = Config()
 
-# init the fastAPI app
-app = FastAPI()
 
 # init VirtualAssistant memory
 # memory = deque(maxlen=cnfg.MAX_MEMORY_SIZE)

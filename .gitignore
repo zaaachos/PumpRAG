@@ -2,5 +2,6 @@
 
 myenv
 .venv
+wikienv
 
 __pycache*
