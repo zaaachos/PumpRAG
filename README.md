@@ -31,7 +31,7 @@ git clone https://github.com/zaaachos/RAGlepedia.git
 
 - Install Dependencies:
   
-It is highly recommended, to use **conda** as your virtual enviroment:
+It is highly recommended, to use **conda** as your virtual environment:
 ```bash
 conda create -n wikienv python=3.9
 ```
