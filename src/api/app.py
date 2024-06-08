@@ -8,9 +8,11 @@ from fastapi.templating import Jinja2Templates
 import os
 from collections import deque
 from dotenv import load_dotenv
+import uvicorn
 
-# from clients.openai_client import OpenAIClient
-# from clients.rag_client import RAGVectorDatabaseClient
+from clients.openai_client import OpenAIClient
+from clients.rag_client import RAGVectorDatabaseClient
+from utils.config import Config
 
 # Initialize FASTAPI app
 app = FastAPI()
@@ -29,32 +31,30 @@ if not os.path.isdir(static_directory):
 templates = Jinja2Templates(directory=templates_directory)
 app.mount("/static", StaticFiles(directory=static_directory), name="static")
 
-
-# from src.api.clients.openai_client import ChatBot
-# from utils.config import Config
-
-
 load_dotenv()
-
-# cnfg = Config()
-
+cnfg = Config()
 
 # init VirtualAssistant memory
-# memory = deque(maxlen=cnfg.MAX_MEMORY_SIZE)
+memory = deque(maxlen=cnfg.MAX_MEMORY_SIZE)
 
 # init the clients
 websocket_clients = []
 
-# # build the chatBot object
-# chatbot = ChatBot(embedding_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"))
-# if not chatbot.check_vector_fullness():
-#     custom_dataset, custom_dataloader, chunk_splitter = chatbot.build_dataset_objects()
-#     chatbot.upload_full_data(custom_dataloader, chunk_splitter)
+# build the chat_client object
+chat_client = OpenAIClient(embedding_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"))
+rag_client = RAGVectorDatabaseClient(index_name=os.getenv("PINECONE_INDEX_NAME"))
 
 
-@app.get("/", response_class=HTMLResponse)
-async def get(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+if not rag_client.check_vector_fullness():
+    custom_dataset, custom_dataloader, chunk_splitter = (
+        rag_client.build_gym_dataset_objects()
+    )
+    rag_client.upload_full_data(chat_client, custom_dataloader, chunk_splitter)
+
+
+# @app.get("/", response_class=HTMLResponse)
+# async def get(request: Request):
+#     return templates.TemplateResponse("index.html", {"request": request})
 
 
 # @app.websocket("/chat")
@@ -80,7 +80,7 @@ async def get(request: Request):
 #             # Receive message from the client
 #             user_message = await websocket.receive_text()
 #             # use RAG to retrieve relevant text-passages
-#             retrieved = chatbot.rag_query(query_text=user_message)
+#             retrieved = chat_client.rag_query(query_text=user_message)
 
 #             top_k_matches = retrieved["matches"]
 #             contexts = [m["metadata"]["text"] for m in top_k_matches]
@@ -100,11 +100,11 @@ async def get(request: Request):
 #             messages.append({"role": "user", "content": f"'QUESTION': {user_message}"})
 #             memory.append(context_str)
 #             # Send message to Azure OpenAI and get response
-#             chatbot_response = await get_openai_response(websocket, messages)
-#             memory.append(chatbot_response)
+#             chat_client_response = await get_openai_response(websocket, messages)
+#             memory.append(chat_client_response)
 
 #             # then append to history messages
-#             messages.append({"role": "assistant", "content": chatbot_response})
+#             messages.append({"role": "assistant", "content": chat_client_response})
 
 #     finally:
 #         # Remove the websocket from the list of clients if connection is closed
@@ -114,7 +114,7 @@ async def get(request: Request):
 # async def get_openai_response(websocket, message: str) -> str:
 #     async with AsyncClient() as client:
 
-#         response = chatbot.respond(message)
+#         response = chat_client.respond(message)
 #         responses = []
 #         for chunk in response:
 #             if len(chunk.choices) > 0:
@@ -129,6 +129,4 @@ async def get(request: Request):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run("app:app", host="0.0.0.0", port=8001, reload=True)

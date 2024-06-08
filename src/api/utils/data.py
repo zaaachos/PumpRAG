@@ -5,6 +5,8 @@ import torch
 from tqdm.auto import tqdm
 import os
 
+import uuid
+
 
 # create custom dataset for Wikipedia dataset
 class WikiDataset(Dataset):
@@ -41,8 +43,48 @@ class WikiDataset(Dataset):
         return meta
 
 
+class GymDataset(Dataset):
+
+    def __init__(
+        self,
+        dataset_path: str,
+    ) -> None:
+        super().__init__()
+        self.dataset_path = dataset_path
+        with open(self.dataset_path, "r+") as f:
+            lines = f.readlines()
+        print("READ")
+        text = "".join(lines)
+        self.exercises_list = text.split("\n----------+\n")
+
+    def __len__(self):
+        return len(self.exercises_list)
+
+    def __getitem__(self, index):
+        exercise = self.exercises_list[index].split("\n")
+        title = exercise[0]
+        text = exercise[1]
+        Extype = exercise[2]
+        body = exercise[3]
+        equipment = exercise[4]
+        level = exercise[5]
+        id = uuid.uuid4()
+        source = self.dataset_path
+        meta = {
+            "sample_id": str(id),
+            "text": text,
+            "title": title,
+            "type": Extype,
+            "body": body,
+            "equipment": equipment,
+            "level": level,
+            "source": source,
+        }
+        return meta
+
+
 def create_dataloader(
-    dataset: WikiDataset, batch_size: int, num_workers: int = 0
+    dataset: WikiDataset | GymDataset, batch_size: int, num_workers: int = 0
 ) -> DataLoader:
     dataloader = DataLoader(
         dataset=dataset,
