@@ -1,10 +1,10 @@
-# RAGlepedia
+# PumpRAG
 
-Welcome to RAGlepedia, your cutting-edge virtual Agent powered by Generative AI (GenAI) models and the innovative Retrieval-Augmented Generation (RAG) approach!
+Welcome to PumpRAG, your cutting-edge virtual Agent powered by Generative AI (GenAI) models and the innovative Retrieval-Augmented Generation (RAG) approach!
 
 ## About
 
-RAGlepedia is designed to be your ultimate companion, providing precise and relevant answers to your queries using context received from VectorDB that contains Wikipedia articles, through state-of-the-art AI technology. With the integration of the RAG model, RAGlepedia ensures that you receive accurate information tailored to your needs.
+PumpRAG is designed to be your ultimate companion, providing precise and relevant answers to your queries using context received from VectorDB that contains Gym Exercises, through state-of-the-art AI technology. With the integration of the RAG model, PumpRAG ensures that you receive accurate information tailored to your needs.
 
 ## Features
 
@@ -18,7 +18,7 @@ RAGlepedia is designed to be your ultimate companion, providing precise and rele
 
 ## Getting Started
 
-To start using RAGlepedia, follow these simple steps:
+To start using PumpRAG, follow these simple steps:
 
 ### 1. Environment Setup
 
@@ -26,17 +26,17 @@ Follow these steps to set up your environment:
 - Clone the Repository:
 
 ```bash
-git clone https://github.com/zaaachos/RAGlepedia.git
+git clone https://github.com/zaaachos/PumpRAG.git
 ```
 
 - Install Dependencies:
   
 It is highly recommended, to use **conda** as your virtual environment:
 ```bash
-conda create -n wikienv python=3.9
+conda create -n venv python=3.9
 ```
 ```bash
-conda activate wikienv
+conda activate venv
 ```
 
 ### 2. Dependencies
