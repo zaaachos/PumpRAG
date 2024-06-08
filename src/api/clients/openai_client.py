@@ -78,7 +78,7 @@ class OpenAIClient:
     def respond(self, messages: List[str]) -> str:
         ic("[BOT] Begin respond")
         response = self.chatBot.chat.completions.create(
-            model="gpt-4-turbo",  # model = "deployment_name".
+            model="gpt-4o",  # model = "deployment_name".
             temperature=0.1,
             max_tokens=200,
             top_p=0.95,

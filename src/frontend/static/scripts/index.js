@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendButton = document.getElementById("send-button");
 
   // Initialize the connection of user with virtual assistant via WebSockets
-  const ws = new WebSocket("ws://localhost:8000/chat");
+  const ws = new WebSocket("ws://localhost:8001/chat");
 
   // When connected to WebSocket server, log a message (for debugging purposes)
   ws.onopen = () => {
