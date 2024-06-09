@@ -75,7 +75,11 @@ class RAGVectorDatabaseClient:
     def retrieve(self, text_embeddings: List[float], top_docs: int = 3) -> None:
         ic("[RAG] Beging Retrieval")
         retrieved = self.index.query(
-            vector=[text_embeddings], top_k=top_docs, include_metadata=True
+            vector=[text_embeddings], 
+            top_k=top_docs, 
+            include_metadata=True, 
+            include_values=True
+
         )
         ic("[RAG] Retrieval Finished")
 
