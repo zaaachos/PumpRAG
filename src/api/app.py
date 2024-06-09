@@ -70,9 +70,11 @@ async def chat_endpoint(websocket: WebSocket):
         messages.append(
             {
                 "role": "system",
-                "content": """You are Q&A bot. A highly intelligent system that answers user questions based on the 'CONTEXT' provided by the user above
-                            each 'QUESTION'. Be Specific and Descriptive. Order matters, so if for example user tells you 'summarize the following...', you have to summarize the
-                            query provided after the word 'following'. If you don't know the answer, please think rationally answer your own knowledge base.""",
+                "content": """You are gym trainer that helps humans to train their muscles providing different exercises. Use the provided CONTEXT \
+                      delimited by [] quotes to answer questions, with "[QUESTION]" format. If the answer cannot be found in the CONTEXT, \
+                          write "Sorry, I don't know the answer to this question.". Be Specific and Descriptive. \
+                            Order matters, so if for example user tells you 'summarize the following...', \
+                            you have to summarize the query provided after the word 'following'.""",
             }
         )
 
@@ -84,21 +86,22 @@ async def chat_endpoint(websocket: WebSocket):
             retrieved = rag_client.retrieve(text_embeddings=user_query_text_embeds)
 
             top_k_matches = retrieved["matches"]
-            contexts = [m["metadata"]["text"] for m in top_k_matches]
+            matched_scores = [m for m in top_k_matches if m["score"]>0.8]
+            matched_contexts = [m["metadata"]["text"] for m in matched_scores]
 
             # create the context message to pass to LLM
-            context_str = "\n\n---\n\n".join(contexts) + "\n\n-----\n\n"
-            print(context_str)
+            context_str = "\n\n---\n\n".join(matched_contexts) + "\n\n-----\n\n"
+            # print(context_str)
             memory.append(context_str)
 
             # Combine RAG contexts with past interactions from memory
-            combined_context = "\n\n".join(contexts + list(memory))
+            combined_context = "\n\n".join(matched_contexts + list(memory))
             messages.append(
-                {"role": "user", "content": f"'CONTEXT': {combined_context}"}
+                {"role": "user", "content": f"[CONTEXT]: {combined_context}"}
             )
 
             # now pass the user message to model
-            messages.append({"role": "user", "content": f"'QUESTION': {user_message}"})
+            messages.append({"role": "user", "content": f"[QUESTION]: {user_message}"})
             memory.append(context_str)
             # Send message to Azure OpenAI and get response
             chat_client_response = await get_openai_response(websocket, messages)

@@ -130,3 +130,20 @@ body {
 .input-box button:hover {
   background-color: #0056b3;
 }
+
+
+.icon {
+  width: 5rem;
+  height: 5rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 20px;
+}
+
+.message.sent .icon {
+  background-image: url('./user.png');
+}
+
+.message.received .icon {
+  background-image: url('./chatbot.png');
+}

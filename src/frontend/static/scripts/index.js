@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to update the chat box with the new message
   ws.onmessage = (event) => {
     const message = event.data;
+    console.log(message);
     updateChat(message);
   };
 
@@ -67,15 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const timestamp = document.createElement("div");
     timestamp.classList.add("timestamp");
     timestamp.textContent = new Date().toLocaleTimeString();
-
     const icon = document.createElement("div");
     icon.classList.add("icon");
-    icon.innerHTML = type === "sent" ? "&#128100;" : "&#128187;"; // User icon and bot icon
+    content.appendChild(timestamp);
 
     content.appendChild(text);
-    content.appendChild(timestamp);
-    messageElement.appendChild(content);
-    messageElement.appendChild(icon);
+    if (type == "received") {
+      messageElement.appendChild(icon);
+      messageElement.appendChild(content);
+    } else {
+      messageElement.appendChild(content);
+      messageElement.appendChild(icon);
+    }
+
     messageContainer.appendChild(messageElement);
     chatBox.appendChild(messageContainer);
 
