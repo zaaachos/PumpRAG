@@ -12,9 +12,9 @@ PumpRAG is designed to be your ultimate companion, providing precise and relevan
 - **Retrieval-Augmented Generation (RAG):** Incorporating the RAG model for precise and relevant answers. Used **Pinecone** for **Vector Database**.
 - **Web API:** Simple **FastAPI** interface for user-agent interaction.
 ## To be added features
-- [ ] Add static templates and use FastAPI framework to load them
+- [x] Add static templates and use FastAPI framework to load them
 - [ ] Add RAG control
-- [ ] Create a more friendly UI
+- [x] Create a more friendly UI
 
 ## Getting Started
 
