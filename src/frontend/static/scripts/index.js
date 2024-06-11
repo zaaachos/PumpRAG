@@ -2,6 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatBox = document.getElementById("chat-box");
   const messageInput = document.getElementById("message-input");
   const sendButton = document.getElementById("send-button");
+  const ragSwitch = document.getElementById("rag-switch");
+  let isRagEnabled = ragSwitch.checked;
+  // Add event listener to handle changes to the switch
+  ragSwitch.addEventListener("change", () => {
+    isRagEnabled = ragSwitch.checked;
+    console.log(isRagEnabled ? "RAG is enabled" : "RAG is disabled");
+  });
 
   // Initialize the connection of user with virtual assistant via WebSockets
   const ws = new WebSocket("ws://localhost:8001/chat");
@@ -16,7 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = messageInput.value.trim();
     if (message !== "") {
       appendMessage(message, "sent");
-      ws.send(message);
+      const messageData = JSON.stringify({ message, isRagEnabled });
+      ws.send(messageData);
+      // ws.send(message);
       messageInput.value = "";
       appendMessage("", "received");
     }

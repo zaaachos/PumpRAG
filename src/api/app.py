@@ -13,6 +13,7 @@ import uvicorn
 from clients.openai_client import OpenAIClient
 from clients.rag_client import RAGVectorDatabaseClient
 from utils.config import Config
+import json
 
 # Initialize FASTAPI app
 app = FastAPI()
@@ -67,42 +68,51 @@ async def chat_endpoint(websocket: WebSocket):
     try:
         # initialise the role of the system
         messages = list()
-        messages.append(
-            {
-                "role": "system",
-                "content": """You are gym trainer that helps humans to train their muscles providing different exercises. Use the provided CONTEXT \
-                      delimited by [] quotes to answer questions, with "[QUESTION]" format. If the answer cannot be found in the CONTEXT, \
-                          write "Sorry, I don't know the answer to this question.". Be Specific and Descriptive. \
-                            Order matters, so if for example user tells you 'summarize the following...', \
-                            you have to summarize the query provided after the word 'following'.""",
-            }
-        )
 
         while True:
             # Receive message from the client
-            user_message = await websocket.receive_text()
-            # use RAG to retrieve relevant text-passages
-            user_query_text_embeds = chat_client.generate_text_embeds(query_text=user_message)
-            retrieved = rag_client.retrieve(text_embeddings=user_query_text_embeds)
+            websocket_data = await websocket.receive_text()
+            data_json = json.loads(websocket_data)
+            user_message = data_json["message"]
+            is_rag_enabled = data_json["isRagEnabled"]
 
-            top_k_matches = retrieved["matches"]
-            matched_scores = [m for m in top_k_matches if m["score"]>0.8]
-            matched_contexts = [m["metadata"]["text"] for m in matched_scores]
+            if is_rag_enabled:
+                messages.append(
+                    {
+                        "role": "system",
+                        "content": """You are gym trainer that helps humans to train their muscles providing different exercises. Use the provided CONTEXT \
+                            delimited by [] quotes to answer questions, with "[QUESTION]" format. If the answer cannot be found in the CONTEXT, \
+                          write "Sorry, I don't know the answer to this question.". Be Specific and Descriptive. \
+                            Order matters, so if for example user tells you 'summarize the following...', \
+                            you have to summarize the query provided after the word 'following'.""",
+                    }
+                )
+                # use RAG to retrieve relevant text-passages
+                user_query_text_embeds = chat_client.generate_text_embeds(
+                    query_text=user_message
+                )
+                retrieved = rag_client.retrieve(text_embeddings=user_query_text_embeds)
 
-            # create the context message to pass to LLM
-            context_str = "\n\n---\n\n".join(matched_contexts) + "\n\n-----\n\n"
-            # print(context_str)
-            memory.append(context_str)
+                top_k_matches = retrieved["matches"]
+                matched_scores = [m for m in top_k_matches if m["score"] > 0.8]
+                matched_contexts = [m["metadata"]["text"] for m in matched_scores]
 
-            # Combine RAG contexts with past interactions from memory
-            combined_context = "\n\n".join(matched_contexts + list(memory))
-            messages.append(
-                {"role": "user", "content": f"[CONTEXT]: {combined_context}"}
-            )
+                # create the context message to pass to LLM
+                context_str = "\n\n---\n\n".join(matched_contexts) + "\n\n-----\n\n"
+                # print(context_str)
+                memory.append(context_str)
+
+                # Combine RAG contexts with past interactions from memory
+                combined_context = "\n\n".join(matched_contexts + list(memory))
+                messages.append(
+                    {"role": "user", "content": f"[CONTEXT]: {combined_context}"}
+                )
+                memory.append(context_str)
+
 
             # now pass the user message to model
             messages.append({"role": "user", "content": f"[QUESTION]: {user_message}"})
-            memory.append(context_str)
+
             # Send message to Azure OpenAI and get response
             chat_client_response = await get_openai_response(websocket, messages)
             memory.append(chat_client_response)
