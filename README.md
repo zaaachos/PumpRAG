@@ -26,20 +26,32 @@ git clone https://github.com/zaaachos/PumpRAG.git
 ```
 
 - Install Dependencies:
-  
-It is highly recommended, to use **conda** as your virtual environment:
+#### Dev Containers
+It is highly recommended, to use **Dev Containers** with Visual Studio Code as your IDE (directory: `.devcontainer`). The Visual Studio Code Dev Containers [extension](https://code.visualstudio.com/docs/devcontainers/tutorial#_install-the-extension) lets you use a container as a full-featured development environment. Learn how to use Dev Containers with this [tutorial](https://code.visualstudio.com/docs/devcontainers/tutorial). In this project PyPoetry is used for better handling our dependencies without any conflicts. After enabling your devcontainer, all the installation are managed for you.
+
+#### Poetry 
+
+If you'd like to use this project on your own with Poetry and without Dev Containers, you can install the libraries like below using conda:
 ```bash
-conda create -n venv python=3.9
-```
-```bash
-conda activate venv
+# download poetry
+curl -sSL https://install.python-poetry.org | python3 -
+# set this to true in order to create the virtual environemnt of poetry inside project
+poetry config virtualenvs.in-project true
+# install dependencies in the poetry venv
+poetry install
+# activate
+poetry shell
 ```
 
-### 2. Dependencies
-Install the necessary dependencies by running:
+#### venv/conda
+If you'd like to use this project on your own without Poetry or Dev Containers, you can use a Virtual Environment and install the libraries like below using conda:
 ```bash
+conda create -n venv python=3.10
+conda activate vevn
 pip install -r requirements.txt
 ```
+
+
 
 You will also need to have an Azure subscription, and create an .env file having the following variables:
 ```
