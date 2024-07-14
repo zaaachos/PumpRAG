@@ -41,15 +41,11 @@ cnfg = Config()
 
 class OpenAIClient:
 
-    def __init__(
-        self,
-        embedding_model_name: str
-    ):
+    def __init__(self, embedding_model_name: str):
         self.chatBot = self.init_chatbot()
         assert isinstance(self.chatBot, AzureOpenAI)
         self.embedding_model = self.chatBot
         self.embedding_model_name = embedding_model_name
-        
 
     def init_chatbot(self):
         try:

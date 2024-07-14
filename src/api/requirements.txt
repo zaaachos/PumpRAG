@@ -1,7 +1,6 @@
 openai
 python-dotenv
 pinecone-client
-pinecone-datasets
 langchain
 datasets
 icecream

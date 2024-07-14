@@ -109,7 +109,6 @@ async def chat_endpoint(websocket: WebSocket):
                 )
                 memory.append(context_str)
 
-
             # now pass the user message to model
             messages.append({"role": "user", "content": f"[QUESTION]: {user_message}"})
 
